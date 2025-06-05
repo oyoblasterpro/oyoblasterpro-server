@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // ✅ Email Sender Function
-const sendMail = async (to: string,subject:string,text:string,html:string) => {
+const sendMail = async (to: string, subject: string, text: string, html: string) => {
     try {
         const info = await transporter.sendMail({
             from: 'info@digitalcreditai.com', // Must be a verified email
@@ -29,9 +29,9 @@ const sendMail = async (to: string,subject:string,text:string,html:string) => {
             html,
         });
 
-        console.log('📧 Email sent!');
-        console.log('Envelope:', info.envelope);
-        console.log('MessageId:', info.messageId);
+        // console.log('📧 Email sent!');
+        // console.log('Envelope:', info.envelope);
+        // console.log('MessageId:', info.messageId);
     } catch (err) {
         console.error('Email send failed:', err);
     }

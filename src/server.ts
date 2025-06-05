@@ -5,7 +5,7 @@ import { configs } from "./app/configs";
 
 
 async function main() {
-    // await mongoose.connect('mongodb://localhost:27017/email-sender');
+    await mongoose.connect(`mongodb+srv://${configs.db.user!}:${configs.db.password!}@cluster0.fp7vkua.mongodb.net/email-sender?retryWrites=true&w=majority&appName=Cluster0`);
     app.listen(configs.port, () => {
         console.log(`Example app listening on port ${configs.port}`)
     })

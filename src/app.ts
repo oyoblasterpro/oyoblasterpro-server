@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import appRouter from './routes'
 import globalErrorHandler from './app/middlewares/global_error_handler'
 import notFound from './app/middlewares/not_found_api'
+import cookieParser from 'cookie-parser'
 
 // define app
 const app = express()
@@ -9,6 +10,7 @@ const app = express()
 // middleware
 app.use(express.json())
 app.use(express.raw())
+app.use(cookieParser())
 app.use("/api", appRouter)
 
 // stating point
