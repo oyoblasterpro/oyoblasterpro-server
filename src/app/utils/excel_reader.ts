@@ -2,7 +2,14 @@ import * as XLSX from 'xlsx';
 import fs from 'fs';
 import path from 'path';
 
-export const excel_reader = (filePath: string): string[] => {
+type SubscriberRow = {
+    email?: string;
+    name?: string;
+    phone?: string;
+    location?: string;
+};
+
+export const excel_reader = (filePath: string): SubscriberRow[] => {
     const ext = path.extname(filePath).toLowerCase();
     let data: any[] = [];
 
@@ -17,12 +24,18 @@ export const excel_reader = (filePath: string): string[] => {
         data = XLSX.utils.sheet_to_json(sheet);
     }
 
-    const emails = data.map(row => {
-        // Normalize keys to lowercase
+    const normalizedData: SubscriberRow[] = data.map(row => {
         const normalizedRow = Object.fromEntries(
             Object.entries(row).map(([key, value]) => [key.toLowerCase(), value])
         );
-        return normalizedRow.email;
-    }).filter(Boolean);
-    return emails as string[];
+
+        return {
+            email: normalizedRow.email as string,
+            name: normalizedRow.name as string,
+            phone: normalizedRow.phone as string,
+            location: normalizedRow.location as string,
+        };
+    }).filter(row => row.email); // Keep rows with at least an email
+
+    return normalizedData;
 };

@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../utils/app_error';
 import { verifyToken } from '../utils/genarate_token';
 import { configs } from '../configs';
+import { TJwtUser } from '../modules/auth/auth.interface';
 
-type Role = "ADMIN" | "SUPER_ADMIN" | "USER"
+type Role = "ADMIN" | "USER"
 
 
 const auth = (...roles: Role[]) => {
@@ -20,7 +21,7 @@ const auth = (...roles: Role[]) => {
             if (!roles.length || !roles.includes(verifiedUser.role)) {
                 throw new AppError('You are not authorize!!', 401);
             }
-            req.user = verifiedUser;
+            req.user = verifiedUser as TJwtUser;
             next();
         } catch (err) {
             next(err);
