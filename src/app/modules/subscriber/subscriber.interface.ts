@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-type Sub = {
+export type Sub = {
     name?: string;
     email: string;
     phone?: string;

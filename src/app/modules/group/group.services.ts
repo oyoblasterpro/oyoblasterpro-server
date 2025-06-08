@@ -37,7 +37,13 @@ const update_group_into_db = async (payload: TGroup, email: string, id: string) 
     if (!isExistGroup) {
         throw new AppError("Group info not found!!", httpStatus.BAD_REQUEST);
     }
-    // 3. update the group
+    //3. check new group name already exist
+    const isGroupNameExist = await Group_Model.findOne({ accountId: isUserExist._id, groupName: payload?.groupName })
+    if (isGroupNameExist) {
+        throw new AppError("Group name exist !!", httpStatus.BAD_REQUEST)
+    }
+
+    // 4. update the group
     const result = await Group_Model.findOneAndUpdate(
         {
             _id: id,
@@ -53,15 +59,51 @@ const update_group_into_db = async (payload: TGroup, email: string, id: string) 
 
     return result;
 };
+
 const get_all_group_from_db = async (email: string) => {
     // 1. Validate user
     const isUserExist = await Account_Model.findOne({ email, status: "ACTIVE", isDeleted: false });
     if (!isUserExist) {
         throw new AppError("You are not authorized or your account is blocked.", httpStatus.BAD_REQUEST);
     }
-    const result = await Group_Model.find({ accountId: isUserExist._id })
+
+    const result = await Group_Model.aggregate([
+        {
+            $match: {
+                accountId: isUserExist._id
+            }
+        },
+        {
+            $lookup: {
+                from: "subscribers", // ensure correct collection name
+                localField: "_id",
+                foreignField: "groupId",
+                as: "subscriberDocs"
+            }
+        },
+        {
+            $addFields: {
+                totalSubscriber: {
+                    $cond: {
+                        if: { $gt: [{ $size: "$subscriberDocs" }, 0] },
+                        then: { $size: { $arrayElemAt: ["$subscriberDocs.subscribers", 0] } },
+                        else: 0
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                subscriberDocs: 0
+            }
+        }
+    ]);
+
+
     return result;
 };
+
+
 
 const get_single_group_with_subscriber_from_db = async (email: string, groupId: string) => {
     // 1. Validate user
@@ -92,7 +134,7 @@ const delete_group_from_db = async (email: string, groupId: string) => {
         throw new AppError("Group info not found!!", httpStatus.NOT_FOUND)
     }
     // remove all subscriber group id
-    await Subscriber_Model.updateMany({ groupId: single_group._id }, { groupId: "" })
+    await Subscriber_Model.updateMany({ groupId: single_group._id }, { groupId: null })
     await Group_Model.findOneAndDelete({ _id: groupId, accountId: isUserExist._id })
     return;
 }
