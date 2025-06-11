@@ -89,12 +89,10 @@ const login_user_from_db = (payload) => __awaiter(void 0, void 0, void 0, functi
         email: isExistAccount.email,
         role: isExistAccount.role,
     }, configs_1.configs.jwt.refresh_token, configs_1.configs.jwt.refresh_expires);
-    yield (0, mail_sender_1.default)(isExistAccount.email, "Login Alert!!", 'Successfully login !!!', `<p>You are successfully login your account. If this wasn't you, please 
-        <a href="" style="color: #1a73e8;">reset your password</a> immediately.
-    </p>`);
     return {
         accessToken: accessToken,
         refreshToken: refreshToken,
+        role: isExistAccount.role
     };
 });
 const get_my_profile_from_db = (email) => __awaiter(void 0, void 0, void 0, function* () {

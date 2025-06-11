@@ -1,5 +1,5 @@
 import { model, Schema, Types } from "mongoose";
-import { TSubscriber } from "./subscriber.interface";
+import { TSubscriber, TSuppression } from "./subscriber.interface";
 
 const sub = new Schema(
     {
@@ -25,6 +25,10 @@ const subscriber_schema = new Schema<TSubscriber>(
 )
 
 
+const suppression_schema = new Schema<TSuppression>({
+    email: { type: String, index: true }
+})
 
+export const Suppression_Model = model("suppression", suppression_schema)
 
 export const Subscriber_Model = model("subscriber", subscriber_schema)

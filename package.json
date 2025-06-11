@@ -15,6 +15,8 @@
     "@aws-sdk/client-sesv2": "^3.823.0",
     "@aws-sdk/credential-provider-node": "^3.823.0",
     "@types/cookie-parser": "^1.4.8",
+    "@types/socket.io": "^3.0.1",
+    "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -26,6 +28,8 @@
     "mongoose": "^8.15.1",
     "multer": "^2.0.1",
     "nodemailer": "^7.0.3",
+    "smtp-client": "^0.4.0",
+    "socket.io": "^4.8.1",
     "typescript": "^5.8.3",
     "xlsx": "^0.18.5",
     "zod": "^3.25.49"
