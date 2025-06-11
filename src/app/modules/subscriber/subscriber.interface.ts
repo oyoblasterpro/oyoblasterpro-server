@@ -9,6 +9,9 @@ export type Sub = {
 export type TSubscriber = {
     accountId?: Types.ObjectId,
     groupId?: Types.ObjectId,
-    subscribers?: Sub
+    subscribers?: Sub[]
 }
 
+export type TSuppression = {
+    email: string
+}

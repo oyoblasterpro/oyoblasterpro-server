@@ -94,42 +94,85 @@ const delete_campaign_into_db = async (req: Request) => {
     return
 }
 
+// const start_mailing_with_campaign = async (req: Request) => {
+//     const { email } = req.user!;
+//     const { id } = req.params;
+
+//     try {
+//         // Find user
+//         const isExistUser = await Account_Model.findOne({ email, status: "ACTIVE", isDeleted: false });
+//         if (!isExistUser) {
+//             throw new AppError("You are not authorized or block account", httpStatus.BAD_REQUEST);
+//         }
+
+//         // Find campaign
+//         const isExistCampaign = await Campaign_Model.findOne({ userId: isExistUser._id, _id: id });
+//         if (!isExistCampaign) {
+//             throw new AppError("Campaign not found!!", httpStatus.NOT_FOUND);
+//         }
+
+//         // Find subscriber group
+//         const subscriber = await Subscriber_Model.findOne({ accountId: isExistUser._id, groupId: isExistCampaign.groupId });
+//         if (!subscriber || !Array.isArray(subscriber.subscribers)) {
+//             throw new AppError("No subscribers found for this campaign group", httpStatus.NOT_FOUND);
+//         }
+
+//         const total = subscriber.subscribers.length;
+//         let sent = 0;
+
+//         for (const sub of subscriber.subscribers) {
+//             const mailRes = await sendMail(sub.email, isExistCampaign.subject, isExistCampaign.text, isExistCampaign.html);
+//             console.log(mailRes)
+//             sent++;
+//         }
+//         await Campaign_Model.findOneAndUpdate({ userId: isExistUser._id, _id: id }, { isDelivered: true })
+//         // Return progress summary
+//         return {
+//             totalMails: total,
+//             mailsSent: sent,
+//         };
+//     } catch (err) {
+//         throw new AppError("Email send failed !", 400)
+//     }
+// };
+
+
 const start_mailing_with_campaign = async (req: Request) => {
     const { email } = req.user!;
     const { id } = req.params;
 
-    // Find user
+    // try {
+    const io = req.app.get("io");
+
     const isExistUser = await Account_Model.findOne({ email, status: "ACTIVE", isDeleted: false });
-    if (!isExistUser) {
-        throw new AppError("You are not authorized or block account", httpStatus.BAD_REQUEST);
-    }
+    if (!isExistUser) throw new AppError("You are not authorized", 400);
 
-    // Find campaign
     const isExistCampaign = await Campaign_Model.findOne({ userId: isExistUser._id, _id: id });
-    if (!isExistCampaign) {
-        throw new AppError("Campaign not found!!", httpStatus.NOT_FOUND);
-    }
+    if (!isExistCampaign) throw new AppError("Campaign not found", 404);
 
-    // Find subscriber group
     const subscriber = await Subscriber_Model.findOne({ accountId: isExistUser._id, groupId: isExistCampaign.groupId });
-    if (!subscriber || !Array.isArray(subscriber.subscribers)) {
-        throw new AppError("No subscribers found for this campaign group", httpStatus.NOT_FOUND);
-    }
+    if (!subscriber || !Array.isArray(subscriber.subscribers)) throw new AppError("No subscribers found", 404);
 
     const total = subscriber.subscribers.length;
     let sent = 0;
-
     for (const sub of subscriber.subscribers) {
         await sendMail(sub.email, isExistCampaign.subject, isExistCampaign.text, isExistCampaign.html);
         sent++;
+
+        io.emit("mail-progress", {
+            sent,
+            total,
+        });
     }
-    await Campaign_Model.findOneAndUpdate({ userId: isExistUser._id, _id: id }, { isDelivered: true })
-    // Return progress summary
-    return {
-        totalMails: total,
-        mailsSent: sent,
-    };
+
+    await Campaign_Model.findOneAndUpdate({ userId: isExistUser._id, _id: id }, { isDelivered: true });
+
+    return { totalMails: total, mailsSent: sent };
+    // } catch (err) {
+    //     throw new AppError("Email send failed", 400);
+    // }
 };
+
 
 
 export const campaign_services = {

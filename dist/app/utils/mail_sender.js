@@ -30,20 +30,13 @@ const transporter = nodemailer_1.default.createTransport({
 });
 // ✅ Email Sender Function
 const sendMail = (to, subject, text, html) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const info = yield transporter.sendMail({
-            from: 'info@digitalcreditai.com', // Must be a verified email
-            to,
-            subject,
-            text,
-            html,
-        });
-        // console.log('📧 Email sent!');
-        // console.log('Envelope:', info.envelope);
-        // console.log('MessageId:', info.messageId);
-    }
-    catch (err) {
-        console.error('Email send failed:', err);
-    }
+    const info = yield transporter.sendMail({
+        from: 'info@digitalcreditai.com',
+        to,
+        subject,
+        text,
+        html,
+    });
+    return info;
 });
 exports.default = sendMail;

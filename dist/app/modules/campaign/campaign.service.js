@@ -94,36 +94,71 @@ const delete_campaign_into_db = (req) => __awaiter(void 0, void 0, void 0, funct
     yield campaign_schema_1.Campaign_Model.findOneAndDelete({ userId: isExistUser._id, _id: id });
     return;
 });
+// const start_mailing_with_campaign = async (req: Request) => {
+//     const { email } = req.user!;
+//     const { id } = req.params;
+//     try {
+//         // Find user
+//         const isExistUser = await Account_Model.findOne({ email, status: "ACTIVE", isDeleted: false });
+//         if (!isExistUser) {
+//             throw new AppError("You are not authorized or block account", httpStatus.BAD_REQUEST);
+//         }
+//         // Find campaign
+//         const isExistCampaign = await Campaign_Model.findOne({ userId: isExistUser._id, _id: id });
+//         if (!isExistCampaign) {
+//             throw new AppError("Campaign not found!!", httpStatus.NOT_FOUND);
+//         }
+//         // Find subscriber group
+//         const subscriber = await Subscriber_Model.findOne({ accountId: isExistUser._id, groupId: isExistCampaign.groupId });
+//         if (!subscriber || !Array.isArray(subscriber.subscribers)) {
+//             throw new AppError("No subscribers found for this campaign group", httpStatus.NOT_FOUND);
+//         }
+//         const total = subscriber.subscribers.length;
+//         let sent = 0;
+//         for (const sub of subscriber.subscribers) {
+//             const mailRes = await sendMail(sub.email, isExistCampaign.subject, isExistCampaign.text, isExistCampaign.html);
+//             console.log(mailRes)
+//             sent++;
+//         }
+//         await Campaign_Model.findOneAndUpdate({ userId: isExistUser._id, _id: id }, { isDelivered: true })
+//         // Return progress summary
+//         return {
+//             totalMails: total,
+//             mailsSent: sent,
+//         };
+//     } catch (err) {
+//         throw new AppError("Email send failed !", 400)
+//     }
+// };
 const start_mailing_with_campaign = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.user;
     const { id } = req.params;
-    // Find user
+    // try {
+    const io = req.app.get("io");
     const isExistUser = yield auth_schema_1.Account_Model.findOne({ email, status: "ACTIVE", isDeleted: false });
-    if (!isExistUser) {
-        throw new app_error_1.AppError("You are not authorized or block account", http_status_1.default.BAD_REQUEST);
-    }
-    // Find campaign
+    if (!isExistUser)
+        throw new app_error_1.AppError("You are not authorized", 400);
     const isExistCampaign = yield campaign_schema_1.Campaign_Model.findOne({ userId: isExistUser._id, _id: id });
-    if (!isExistCampaign) {
-        throw new app_error_1.AppError("Campaign not found!!", http_status_1.default.NOT_FOUND);
-    }
-    // Find subscriber group
+    if (!isExistCampaign)
+        throw new app_error_1.AppError("Campaign not found", 404);
     const subscriber = yield subscriber_schema_1.Subscriber_Model.findOne({ accountId: isExistUser._id, groupId: isExistCampaign.groupId });
-    if (!subscriber || !Array.isArray(subscriber.subscribers)) {
-        throw new app_error_1.AppError("No subscribers found for this campaign group", http_status_1.default.NOT_FOUND);
-    }
+    if (!subscriber || !Array.isArray(subscriber.subscribers))
+        throw new app_error_1.AppError("No subscribers found", 404);
     const total = subscriber.subscribers.length;
     let sent = 0;
     for (const sub of subscriber.subscribers) {
         yield (0, mail_sender_1.default)(sub.email, isExistCampaign.subject, isExistCampaign.text, isExistCampaign.html);
         sent++;
+        io.emit("mail-progress", {
+            sent,
+            total,
+        });
     }
     yield campaign_schema_1.Campaign_Model.findOneAndUpdate({ userId: isExistUser._id, _id: id }, { isDelivered: true });
-    // Return progress summary
-    return {
-        totalMails: total,
-        mailsSent: sent,
-    };
+    return { totalMails: total, mailsSent: sent };
+    // } catch (err) {
+    //     throw new AppError("Email send failed", 400);
+    // }
 });
 exports.campaign_services = {
     save_campaign_into_db,

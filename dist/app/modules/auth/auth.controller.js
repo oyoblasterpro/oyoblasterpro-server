@@ -39,6 +39,7 @@ const login_user = (0, catch_async_1.default)((req, res) => __awaiter(void 0, vo
         message: 'User is logged in successful !',
         data: {
             accessToken: result.accessToken,
+            role: result === null || result === void 0 ? void 0 : result.role
         },
     });
 }));

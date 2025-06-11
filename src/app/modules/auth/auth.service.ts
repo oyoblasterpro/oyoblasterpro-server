@@ -101,17 +101,10 @@ const login_user_from_db = async (payload: TLoginPayload) => {
         configs.jwt.refresh_token as Secret,
         configs.jwt.refresh_expires as string,
     );
-    await mail_sender(
-        isExistAccount.email,
-        "Login Alert!!",
-        'Successfully login !!!',
-        `<p>You are successfully login your account. If this wasn't you, please 
-        <a href="" style="color: #1a73e8;">reset your password</a> immediately.
-    </p>`,
-    );
     return {
         accessToken: accessToken,
         refreshToken: refreshToken,
+        role: isExistAccount.role
     };
 
 }
