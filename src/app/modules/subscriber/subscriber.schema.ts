@@ -3,12 +3,9 @@ import { TSubscriber, TSuppression } from "./subscriber.interface";
 
 const sub = new Schema(
     {
-        name: { type: String, required: false },
         email: { type: String, required: false },
-        phone: { type: String, required: false },
-        location: { type: String, required: false },
     },
-    { _id: false }
+    { _id: false, strict: false, }
 );
 
 

@@ -3,10 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 type SubscriberRow = {
-    email?: string;
-    name?: string;
-    phone?: string;
-    location?: string;
+    email: string;
+    [key: string]: any;
 };
 
 export const excel_reader = (filePath: string): SubscriberRow[] => {
@@ -29,13 +27,16 @@ export const excel_reader = (filePath: string): SubscriberRow[] => {
             Object.entries(row).map(([key, value]) => [key.toLowerCase(), value])
         );
 
+        const { email, ...rest } = normalizedRow;
+
+        if (!email) return null;
+
         return {
-            email: normalizedRow.email as string,
-            name: normalizedRow.name as string,
-            phone: normalizedRow.phone as string,
-            location: normalizedRow.location as string,
+            email,
+            ...rest,
         };
-    }).filter(row => row.email); // Keep rows with at least an email
+    }).filter((row): row is SubscriberRow => row !== null);
+
 
     return normalizedData;
 };

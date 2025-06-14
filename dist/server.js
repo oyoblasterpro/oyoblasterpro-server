@@ -1,7 +1,4 @@
 "use strict";
-// import mongoose from "mongoose";
-// import app from "./app";
-// import { configs } from "./app/configs";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,13 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// async function main() {
-//     await mongoose.connect(`mongodb+srv://${configs.db.user!}:${configs.db.password!}@cluster0.fp7vkua.mongodb.net/email-sender?retryWrites=true&w=majority&appName=Cluster0`);
-//     app.listen(configs.port, () => {
-//         console.log(`Example app listening on port ${configs.port}`)
-//     })
-// }
-// main().catch(err => console.log(err));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -37,7 +27,6 @@ const io = new socket_io_1.Server(server, {
 });
 app_1.default.set("io", io);
 io.on("connection", (socket) => {
-    console.log("Client connected:", socket.id);
 });
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
