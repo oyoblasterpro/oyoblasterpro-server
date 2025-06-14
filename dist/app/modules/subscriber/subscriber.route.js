@@ -10,6 +10,7 @@ const request_validator_1 = __importDefault(require("../../middlewares/request_v
 const subscriber_validation_1 = require("./subscriber.validation");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
 const subscriber_route = (0, express_1.Router)();
+subscriber_route.get("/", (0, auth_1.default)("ADMIN", "USER"), subscriber_controller_1.subscriber_controller.get_all_subscriber);
 subscriber_route.post("/", (0, auth_1.default)("ADMIN", "USER"), uploader_1.default.single("file"), (req, res, next) => {
     var _a;
     req.body = JSON.parse((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.data);

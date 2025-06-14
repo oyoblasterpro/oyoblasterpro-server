@@ -6,7 +6,7 @@ import { subscriber_validation } from "./subscriber.validation";
 import auth from "../../middlewares/auth";
 const subscriber_route = Router()
 
-
+subscriber_route.get("/", auth("ADMIN", "USER"), subscriber_controller.get_all_subscriber)
 subscriber_route.post("/",
     auth("ADMIN", "USER"),
     uploader.single("file"),

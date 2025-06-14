@@ -123,13 +123,14 @@ const create_subscriber_into_db = (req) => __awaiter(void 0, void 0, void 0, fun
         accountId: isExistAccount._id,
         groupId: (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.groupId,
     });
+    console.log(hasSubscribers);
     try {
         const io = req.app.get("io");
         const validEmails = [];
         const invalidEmails = [];
         let checked = 0;
         yield Promise.all(emails.map((item) => __awaiter(void 0, void 0, void 0, function* () {
-            const targetEmail = item.email;
+            const targetEmail = item === null || item === void 0 ? void 0 : item.email;
             const isValid = yield (0, mailValidator_1.verifyEmail)(targetEmail);
             checked += 1;
             if (isValid) {
@@ -156,7 +157,7 @@ const create_subscriber_into_db = (req) => __awaiter(void 0, void 0, void 0, fun
             const newSubs = validEmails.filter((s) => !existingEmailsSet.has(s.email));
             const updated = [...existing, ...newSubs];
             yield subscriber_schema_1.Subscriber_Model.updateOne({ _id: hasSubscribers._id }, { $set: { subscribers: updated } });
-            return { total: emails === null || emails === void 0 ? void 0 : emails.length, valid: validEmails === null || validEmails === void 0 ? void 0 : validEmails.length };
+            // return { total: emails?.length, valid: validEmails?.length };
         }
         else {
             const payload = {
@@ -164,6 +165,7 @@ const create_subscriber_into_db = (req) => __awaiter(void 0, void 0, void 0, fun
                 groupId: req.body.groupId,
                 subscribers: validEmails,
             };
+            console.log(payload);
             yield subscriber_schema_1.Subscriber_Model.create(payload);
             return { total: emails === null || emails === void 0 ? void 0 : emails.length, valid: validEmails === null || validEmails === void 0 ? void 0 : validEmails.length };
         }
@@ -175,6 +177,21 @@ const create_subscriber_into_db = (req) => __awaiter(void 0, void 0, void 0, fun
         yield promises_1.default.unlink(filePath);
     }
 });
+// get all subscriber for logged user
+const get_all_subscribers = (groupId, email) => __awaiter(void 0, void 0, void 0, function* () {
+    // find user exist or not
+    const isExistAccount = yield auth_schema_1.Account_Model.findOne({ email }).lean();
+    if (!isExistAccount) {
+        throw new app_error_1.AppError("You are not authorized!!", http_status_1.default.BAD_REQUEST);
+    }
+    // find subscriber
+    const subscribers = yield subscriber_schema_1.Subscriber_Model.findOne({ groupId, accountId: isExistAccount._id }).lean();
+    if (!subscribers) {
+        throw new app_error_1.AppError("Subscribers not found!!", http_status_1.default.NOT_FOUND);
+    }
+    return subscribers;
+});
 exports.subscriber_service = {
-    create_subscriber_into_db
+    create_subscriber_into_db,
+    get_all_subscribers
 };

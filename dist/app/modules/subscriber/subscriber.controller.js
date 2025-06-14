@@ -26,6 +26,18 @@ const create_subscriber = (0, catch_async_1.default)((req, res) => __awaiter(voi
         data: result
     });
 }));
+const get_all_subscriber = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { groupId } = req === null || req === void 0 ? void 0 : req.query;
+    const { email } = req === null || req === void 0 ? void 0 : req.user;
+    const result = yield subscriber_service_1.subscriber_service.get_all_subscribers(groupId, email);
+    (0, manage_response_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Subscribers fetched!!",
+        data: result
+    });
+}));
 exports.subscriber_controller = {
-    create_subscriber
+    create_subscriber,
+    get_all_subscriber
 };

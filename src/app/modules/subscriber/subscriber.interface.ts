@@ -1,10 +1,8 @@
 import { Types } from "mongoose";
 
 export type Sub = {
-    name?: string;
     email: string;
-    phone?: string;
-    location?: string;
+    [key: string]: any
 }
 export type TSubscriber = {
     accountId?: Types.ObjectId,

@@ -133,6 +133,7 @@ const create_subscriber_into_db = async (req: Request) => {
         accountId: isExistAccount._id,
         groupId: req?.body?.groupId,
     });
+    console.log(hasSubscribers)
 
 
     try {
@@ -142,7 +143,7 @@ const create_subscriber_into_db = async (req: Request) => {
         let checked = 0
         await Promise.all(
             emails.map(async (item) => {
-                const targetEmail = item.email as string;
+                const targetEmail = item?.email as string;
                 const isValid = await verifyEmail(targetEmail);
                 checked += 1
                 if (isValid) {
@@ -178,15 +179,15 @@ const create_subscriber_into_db = async (req: Request) => {
                 { $set: { subscribers: updated } }
             );
 
-            return { total: emails?.length, valid: validEmails?.length };
+            // return { total: emails?.length, valid: validEmails?.length };
         } else {
             const payload = {
                 accountId: isExistAccount._id,
                 groupId: req.body.groupId,
                 subscribers: validEmails,
             };
+            console.log(payload)
             await Subscriber_Model.create(payload);
-
             return { total: emails?.length, valid: validEmails?.length };
         }
     } catch (error) {
@@ -197,7 +198,24 @@ const create_subscriber_into_db = async (req: Request) => {
 };
 
 
+// get all subscriber for logged user
+const get_all_subscribers = async (groupId: string, email: string) => {
+    // find user exist or not
+    const isExistAccount = await Account_Model.findOne({ email }).lean()
+    if (!isExistAccount) {
+        throw new AppError("You are not authorized!!", httpStatus.BAD_REQUEST)
+    }
+
+    // find subscriber
+    const subscribers = await Subscriber_Model.findOne({ groupId, accountId: isExistAccount._id }).lean()
+    if (!subscribers) {
+        throw new AppError("Subscribers not found!!", httpStatus.NOT_FOUND)
+    }
+    return subscribers;
+}
+
 
 export const subscriber_service = {
-    create_subscriber_into_db
+    create_subscriber_into_db,
+    get_all_subscribers
 }
