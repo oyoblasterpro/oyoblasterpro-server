@@ -8,104 +8,6 @@ import fs from 'fs/promises';
 import { verifyEmail } from "../../utils/mailValidator";
 import { Sub } from "./subscriber.interface";
 
-// const create_subscriber_into_db = async (req: Request) => {
-//     const filePath = req.file!.path;
-//     const emails = excel_reader(filePath);
-//     const email = req?.user?.email as string;
-//     const isExistAccount = await Account_Model.findOne({
-//         email,
-//         status: "ACTIVE",
-//         isDeleted: false,
-//     });
-
-//     if (!isExistAccount) {
-//         // Delete file on error
-//         await fs.unlink(filePath);
-//         throw new AppError("You are not authorized or account blocked", httpStatus.BAD_REQUEST);
-//     }
-
-//     if (!emails.length) {
-//         // Delete file on error
-//         await fs.unlink(filePath);
-//         throw new AppError("Please insert minimum 1 data", httpStatus.BAD_REQUEST);
-//     }
-//     // check email before save is valid or bounce
-//     const validateEmail = []
-//     for (const email of emails) {
-//         if (await verifyEmail(email?.email as string)) {
-//             validateEmail.push(email)
-//         }
-//     }
-//     return { valid: validateEmail.length, total: emails.length }
-
-//     // const payload = {
-//     //     accountId: isExistAccount._id,
-//     //     groupId: req?.body?.groupId,
-//     //     subscribers: emails,
-//     // };
-
-//     // const result = await Subscriber_Model.insertMany(payload);
-
-//     // ✅ Delete file only after successful save
-//     // await fs.unlink(filePath);
-
-//     // return result;
-// };
-
-
-
-// const create_subscriber_into_db = async (req: Request) => {
-//     const filePath = req.file!.path;
-//     const emails = excel_reader(filePath);
-//     const email = req?.user?.email as string;
-//     const isExistAccount = await Account_Model.findOne({
-//         email,
-//         status: "ACTIVE",
-//         isDeleted: false,
-//     });
-
-//     if (!isExistAccount) {
-//         await fs.unlink(filePath);
-//         throw new AppError("You are not authorized or account blocked", httpStatus.BAD_REQUEST);
-//     }
-
-//     if (!emails.length) {
-//         await fs.unlink(filePath);
-//         throw new AppError("Please insert minimum 1 data", httpStatus.BAD_REQUEST);
-//     }
-
-//     try {
-//         const validationResults = await Promise.all(
-//             emails.map(async (item) => {
-//                 const isValid = await verifyEmail(item.email as string);
-//                 return isValid ? item : null;
-//             })
-//         );
-
-//         const validEmails = validationResults.filter(Boolean);
-
-//         const payload = {
-//             accountId: isExistAccount._id,
-//             groupId: req?.body?.groupId,
-//             subscribers: validEmails,
-//         };
-
-//         const result = await Subscriber_Model.insertMany(payload);
-
-//         // ✅ Delete file only after successful save
-//         await fs.unlink(filePath);
-
-//         return result;
-//     }
-//     catch (error) {
-//         console.log(error)
-//     }
-//     finally {
-//         // অবশিষ্ট থাকা ফাইল ডিলিট করো
-//         await fs.unlink(filePath);
-//     }
-// };
-
 
 
 const create_subscriber_into_db = async (req: Request) => {
@@ -133,7 +35,6 @@ const create_subscriber_into_db = async (req: Request) => {
         accountId: isExistAccount._id,
         groupId: req?.body?.groupId,
     });
-    console.log(hasSubscribers)
 
 
     try {
@@ -186,7 +87,6 @@ const create_subscriber_into_db = async (req: Request) => {
                 groupId: req.body.groupId,
                 subscribers: validEmails,
             };
-            console.log(payload)
             await Subscriber_Model.create(payload);
             return { total: emails?.length, valid: validEmails?.length };
         }
