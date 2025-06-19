@@ -19,7 +19,7 @@ const sendElasticEmail = (email: string, subject: string, html: string) => {
             Body: [
                 ElasticEmail.BodyPart.constructFromObject({
                     ContentType: "HTML",
-                    Content: "My test email content ;)"
+                    Content: html
                 })
             ],
             Subject: subject,

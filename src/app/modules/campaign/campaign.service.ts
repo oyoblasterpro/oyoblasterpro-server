@@ -158,7 +158,7 @@ const start_mailing_with_campaign = async (req: Request) => {
     const total = subscriber.subscribers.length;
     let sent = 0;
     for (const sub of subscriber.subscribers) {
-        await sendElasticEmail(sub.email, isExistCampaign.subject, isExistCampaign.html);
+        sendElasticEmail(sub.email, isExistCampaign.subject, isExistCampaign.html);
         sent++;
 
         io.emit("mail-progress", {
