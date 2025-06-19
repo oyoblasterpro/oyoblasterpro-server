@@ -21,5 +21,6 @@ export const configs = {
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD
     },
+    el_api_key: process.env.ELASTIC_API_KEY
 
 }

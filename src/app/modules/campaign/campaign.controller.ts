@@ -75,6 +75,15 @@ const start_mailing = catchAsync(async (req, res) => {
         data: result
     })
 })
+const send_test = catchAsync(async (req, res) => {
+    const result = await campaign_services.send_test_mail(req?.body?.email)
+    manageResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Successfully send",
+        data: result
+    })
+})
 
 
 export const campaign_controllers = {
@@ -84,5 +93,7 @@ export const campaign_controllers = {
     get_single_campaign,
     update_campaign,
     delete_campaign,
-    start_mailing
+    start_mailing,
+    send_test
+
 }

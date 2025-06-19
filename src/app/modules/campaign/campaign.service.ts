@@ -8,6 +8,8 @@ import { Account_Model } from "../auth/auth.schema";
 import { Subscriber_Model } from "../subscriber/subscriber.schema";
 import { Sub } from "../subscriber/subscriber.interface";
 import sendMail from "../../utils/mail_sender";
+import sendElasticEmail from "../../utils/elasticEmail";
+
 
 
 const save_campaign_into_db = async (payload: TCampaign, email: string) => {
@@ -156,7 +158,7 @@ const start_mailing_with_campaign = async (req: Request) => {
     const total = subscriber.subscribers.length;
     let sent = 0;
     for (const sub of subscriber.subscribers) {
-        await sendMail(sub.email, isExistCampaign.subject, isExistCampaign.text, isExistCampaign.html);
+        await sendElasticEmail(sub.email, isExistCampaign.subject, isExistCampaign.html);
         sent++;
 
         io.emit("mail-progress", {
@@ -172,6 +174,10 @@ const start_mailing_with_campaign = async (req: Request) => {
     //     throw new AppError("Email send failed", 400);
     // }
 };
+const send_test_mail = async (email: string) => {
+    sendElasticEmail(email, "Hello", "hello")
+    return null
+}
 
 
 
@@ -181,5 +187,7 @@ export const campaign_services = {
     get_single_campaign_from_db,
     update_campaign_into_db,
     delete_campaign_into_db,
-    start_mailing_with_campaign
+    start_mailing_with_campaign,
+    send_test_mail
+
 }
